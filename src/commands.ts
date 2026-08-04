@@ -1,9 +1,6 @@
 import * as vscode from "vscode";
-import {
-  addCrateToWorkspace,
-  createProject,
-  createWorkspace,
-} from "./utils/cargo";
+import { createProject, createWorkspace } from "./cargo/cargo";
+import { addCrateToWorkspace } from "./cargo/addCrateToWorkspace";
 import { showErrorMessage } from "./utils/logging";
 import { cargoInstalled, rustInstalled } from "./utils/shcommands";
 export function registerCommands(context: vscode.ExtensionContext) {
@@ -16,6 +13,13 @@ export function registerCommands(context: vscode.ExtensionContext) {
   pushCommand(context, "rust-buddy.addCrateToWorkspace", () => {
     checkRustCargoBeforeCommand(addCrateToWorkspace);
   });
+}
+export async function runExtCommands(command: "createWorkspace") {
+  switch (command) {
+    case "createWorkspace":
+      vscode.commands.executeCommand("rust-buddy.createWorkspace");
+      break;
+  }
 }
 async function checkRustCargoBeforeCommand(
   functionToExecute: () => Promise<void>,

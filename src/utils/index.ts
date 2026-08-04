@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { showProjectCancelledMessage } from "./cargo";
+import { showProjectCancelledMessage } from "../cargo/cargo";
 import { showErrorMessage } from "./logging";
 
 export async function fileExists(uri: vscode.Uri): Promise<boolean> {
@@ -10,7 +10,6 @@ export async function fileExists(uri: vscode.Uri): Promise<boolean> {
     return false;
   }
 }
-export async function promptVscodeFileOpen(prompt:string,uri: vscode.Uri): Promise<void> {}
 export async function collectPath(label: string): Promise<vscode.Uri[] | null> {
   const path = await vscode.window.showOpenDialog({
     canSelectFolders: true,
@@ -19,8 +18,6 @@ export async function collectPath(label: string): Promise<vscode.Uri[] | null> {
     openLabel: label,
   });
   if (!path || path.length === 0) {
-    showProjectCancelledMessage();
-
     return null;
   }
   return path;

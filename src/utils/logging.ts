@@ -34,3 +34,21 @@ export async function actionableInformationMessage(
     }
   }
 }
+export async function actionableErrorMessage(
+  message: string,
+  action: {
+    label: string;
+    runWhenSelected: () => void;
+  }[],
+): Promise<void> {
+  const choice = await vscode.window.showErrorMessage(
+    message,
+    ...action.map((a) => a.label),
+  );
+  if (choice !== null) {
+    const selectedAction = action.find((a) => a.label === choice);
+    if (selectedAction) {
+      selectedAction.runWhenSelected();
+    }
+  }
+}
