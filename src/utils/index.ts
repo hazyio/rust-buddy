@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { showProjectCancelledMessage } from "../cargo/cargo";
 import { showErrorMessage } from "./logging";
 
 export async function fileExists(uri: vscode.Uri): Promise<boolean> {

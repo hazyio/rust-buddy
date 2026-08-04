@@ -1,19 +1,11 @@
 import {
   actionableInformationMessage,
   showErrorMessage,
-  showInformationMessage,
 } from "../utils/logging";
 import * as vscode from "vscode";
 import { collectPath, createDirectory, fileExists, writeFile } from "../utils";
-import { runCommandAsync } from "../utils/shcommands";
 import { collectCrateCreationOptions, createCrate } from "./crate";
-export function showProjectCancelledMessage(
-  collecting: "project" | "workspace" | "add crate" | "crate" = "project",
-) {
-  showInformationMessage(
-    `${collecting.charAt(0).toUpperCase() + collecting.slice(1)} creation cancelled.`,
-  );
-}
+
 export async function collectProjectName(
   collecting: "project" | "workspace" | "crate" = "project",
   checkPath: vscode.Uri | null = null,
@@ -38,7 +30,6 @@ export async function collectProjectName(
     },
   });
   if (!result) {
-    showProjectCancelledMessage(collecting);
     return null;
   }
   if (checkPath !== null) {
@@ -55,7 +46,6 @@ export async function collectProjectName(
 export async function createWorkspace() {
   const workspacePath = await collectPath("Select workspace location");
   if (workspacePath === null) {
-    showProjectCancelledMessage("workspace");
     return;
   }
   const workspaceName = await collectProjectName("workspace", workspacePath[0]);

@@ -24,8 +24,27 @@
       {
         "command": "rust-buddy.addCrateToWorkspace",
         "title": "Rust Buddy: Add Crate to Workspace"
+      },
+      {
+        "command": "rust-buddy.addCrateToWorkspaceFromContext",
+        "title": "Rust Buddy: Add Crate to Workspace"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "rust-buddy.addCrateToWorkspaceFromContext",
+          "when": "false"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "rust-buddy.addCrateToWorkspaceFromContext",
+          "when": "explorerResourceIsFolder && resourcePath in rust-buddy.cargoWorkspaceRoots",
+          "group": "1_rustbuddy"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

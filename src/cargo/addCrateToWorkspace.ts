@@ -1,14 +1,11 @@
 import path from "path";
 import * as vscode from "vscode";
-import {
-  actionableErrorMessage,
-  actionableInformationMessage,
-} from "../utils/logging";
+import { actionableErrorMessage, showErrorMessage } from "../utils/logging";
 import * as fs from "fs/promises";
-import { showProjectCancelledMessage } from "./cargo";
 import { collectPath } from "../utils";
 import { runExtCommands } from "../commands";
 import { collectCrateCreationOptions, createCrate } from "./crate";
+import { getCargoWorkspaceRoots } from "../utils/context";
 async function addMemberToWorkspace(root: vscode.Uri, crateName: string) {
   const tomlPath = vscode.Uri.joinPath(root, "Cargo.toml");
   let content = await fs.readFile(tomlPath.path, "utf-8"); // using fs/promises import
@@ -81,55 +78,50 @@ async function addCrate(workspacePath: vscode.Uri[]) {
     crateCreationOptions.crateName,
   );
 }
+export async function addCrateToWorkspaceFromContext(uri: vscode.Uri) {
+  if (!(await dirIsWorkspace(uri))) {
+    showErrorMessage(`Not a valid Rust workspace.`);
+    return;
+  }
+  await addCrate([uri]);
+}
+export async function addCrateToWorkspaceFromCommand() {
+  const workspaceRoots = getCargoWorkspaceRoots();
 
-export async function addCrateToWorkspace() {
-  const folders = vscode.workspace.workspaceFolders;
-
-  if (!folders?.length) {
+  if (workspaceRoots.length === 0) {
     await actionableErrorMessage("No rust workspace open.", [
       {
         label: "Choose workspace",
         runWhenSelected: useCustomWorkspace,
       },
+      {
+        label: "Create workspace",
+        runWhenSelected: async () => {
+          await runExtCommands("createWorkspace");
+        },
+      },
     ]);
     return;
   } else {
-    const allRoots: string[] = [];
-    for (const f of folders) {
-      allRoots.push(...(await findWorkspaceRoots(f.uri.fsPath)));
-    }
-    if (allRoots.length === 0) {
-      await actionableErrorMessage(
-        "No rust workspace found in the current opened folder.",
-        [
-          {
-            label: "Choose workspace",
-            runWhenSelected: useCustomWorkspace,
-          },
-        ],
-      );
+    const picked = await vscode.window.showQuickPick(
+      [
+        ...workspaceRoots.map((r) => ({
+          label: path.basename(r),
+          description: r,
+          root: r,
+        })),
+        { label: "Choose workspace", root: null },
+      ],
+      { placeHolder: "Select workspace" },
+    );
+    if (picked === undefined) {
       return;
-    } else {
-      const picked = await vscode.window.showQuickPick(
-        [
-          ...allRoots.map((r) => ({
-            label: path.basename(r),
-            description: r,
-            root: r,
-          })),
-          { label: "Choose workspace", root: null },
-        ],
-        { placeHolder: "Select workspace" },
-      );
-      if (picked === undefined) {
-        return;
-      }
-      if (picked.root === null) {
-        await useCustomWorkspace();
-        return;
-      }
-      await addCrate([vscode.Uri.file(picked.root)]);
     }
+    if (picked.root === null) {
+      await useCustomWorkspace();
+      return;
+    }
+    await addCrate([vscode.Uri.file(picked.root)]);
   }
 }
 async function dirIsWorkspace(dir: vscode.Uri): Promise<boolean> {
@@ -140,16 +132,4 @@ async function dirIsWorkspace(dir: vscode.Uri): Promise<boolean> {
   } catch {
     return false;
   }
-}
-export async function findWorkspaceRoots(root: string): Promise<string[]> {
-  const found: string[] = [];
-  const pattern = new vscode.RelativePattern(root, "**/Cargo.toml");
-  const files = await vscode.workspace.findFiles(pattern, "**/target/**"); // exclude build output
-
-  for (const file of files) {
-    if (await dirIsWorkspace(vscode.Uri.file(path.dirname(file.fsPath)))) {
-      found.push(path.dirname(file.fsPath));
-    }
-  }
-  return found;
 }
