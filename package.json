@@ -14,8 +14,16 @@
   "contributes": {
     "commands": [
       {
-        "command": "rust-buddy.helloWorld",
-        "title": "Hello World"
+        "command": "rust-buddy.createProject",
+        "title": "Rust Buddy: Create Rust Project (Standalone Crate)"
+      },
+      {
+        "command": "rust-buddy.createWorkspace",
+        "title": "Rust Buddy: Create Workspace"
+      },
+      {
+        "command": "rust-buddy.addCrateToWorkspace",
+        "title": "Rust Buddy: Add Crate to Workspace"
       }
     ]
   },
@@ -34,15 +42,15 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.125.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "typescript-eslint": "^8.56.1",
-    "eslint": "^9.39.3",
+    "@types/vscode": "^1.125.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
     "esbuild": "^0.27.3",
+    "eslint": "^9.39.3",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.9.3",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "typescript-eslint": "^8.56.1"
   }
 }
