@@ -7,7 +7,7 @@ import { collectPath, createDirectory, fileExists, writeFile } from "../utils";
 import { collectCrateCreationOptions, createCrate } from "./crate";
 
 export async function collectProjectName(
-  collecting: "project" | "workspace" | "crate" = "project",
+  collecting: "project" | "workspace" | "crate" | "module" = "project",
   checkPath: vscode.Uri | null = null,
   lastValue: string | undefined = undefined,
 ): Promise<string | null> {

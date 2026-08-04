@@ -1,5 +1,8 @@
 import * as vscode from "vscode";
+import * as fs from "fs/promises";
+
 import { showErrorMessage } from "./logging";
+import path from "path";
 
 export async function fileExists(uri: vscode.Uri): Promise<boolean> {
   try {

@@ -9,7 +9,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "workspaceContains:**/Cargo.toml"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -28,12 +30,36 @@
       {
         "command": "rust-buddy.addCrateToWorkspaceFromContext",
         "title": "Rust Buddy: Add Crate to Workspace"
+      },
+      {
+        "command": "rust-buddy.addDirModuleModFromContext",
+        "title": "Rust Buddy: New directory module with mod.rs"
+      },
+      {
+        "command": "rust-buddy.addFileModuleFromContext",
+        "title": "Rust Buddy: New file module"
+      },
+      {
+        "command": "rust-buddy.addDirModuleFromContext",
+        "title": "Rust Buddy: New directory module"
       }
     ],
     "menus": {
       "commandPalette": [
         {
           "command": "rust-buddy.addCrateToWorkspaceFromContext",
+          "when": "false"
+        },
+        {
+          "command": "rust-buddy.addDirModuleModFromContext",
+          "when": "false"
+        },
+        {
+          "command": "rust-buddy.addFileModuleFromContext",
+          "when": "false"
+        },
+        {
+          "command": "rust-buddy.addDirModuleFromContext",
           "when": "false"
         }
       ],
@@ -42,6 +68,21 @@
           "command": "rust-buddy.addCrateToWorkspaceFromContext",
           "when": "explorerResourceIsFolder && resourcePath in rust-buddy.cargoWorkspaceRoots",
           "group": "1_rustbuddy"
+        },
+        {
+          "command": "rust-buddy.addFileModuleFromContext",
+          "when": "explorerResourceIsFolder && resourcePath in rust-buddy.rustCrateRoots",
+          "group": "2_rustbuddy"
+        },
+        {
+          "command": "rust-buddy.addDirModuleModFromContext",
+          "when": "explorerResourceIsFolder && resourcePath in rust-buddy.rustCrateRoots",
+          "group": "3_rustbuddy"
+        },
+        {
+          "command": "rust-buddy.addDirModuleFromContext",
+          "when": "explorerResourceIsFolder && resourcePath in rust-buddy.rustCrateRoots",
+          "group": "4_rustbuddy"
         }
       ]
     }

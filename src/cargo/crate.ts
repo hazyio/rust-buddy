@@ -88,7 +88,7 @@ export async function createCrate(
           },
         );
 
-        actionableInformationMessage(
+        await actionableInformationMessage(
           `${label} ${crateName} created successfully at ${projectUri.fsPath}`,
           showOpen
             ? [

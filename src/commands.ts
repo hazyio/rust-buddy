@@ -1,3 +1,4 @@
+import * as fs from "fs/promises";
 import * as vscode from "vscode";
 import { createProject, createWorkspace } from "./cargo/cargo";
 import {
@@ -6,6 +7,8 @@ import {
 } from "./cargo/addCrateToWorkspace";
 import { showErrorMessage } from "./utils/logging";
 import { cargoInstalled, rustInstalled } from "./utils/shcommands";
+import path from "path";
+import { createFileModule } from "./cargo/modules";
 export function registerCommands(context: vscode.ExtensionContext) {
   pushCommand(context, "rust-buddy.createProject", () => {
     checkRustCargoBeforeCommand(createProject);
@@ -22,6 +25,23 @@ export function registerCommands(context: vscode.ExtensionContext) {
     (uri: vscode.Uri) => {
       checkRustCargoBeforeCommand(() => addCrateToWorkspaceFromContext(uri));
     },
+  );
+  pushCommand(
+    context,
+    "rust-buddy.addDirModuleModFromContext",
+    async (uri: vscode.Uri) => {},
+  );
+  pushCommand(
+    context,
+    "rust-buddy.addFileModuleFromContext",
+    async (uri: vscode.Uri) => {
+      createFileModule(uri);
+    },
+  );
+  pushCommand(
+    context,
+    "rust-buddy.addDirModuleFromContext",
+    async (uri: vscode.Uri) => {},
   );
 }
 export async function runExtCommands(command: "createWorkspace") {
