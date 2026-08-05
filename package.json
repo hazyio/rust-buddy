@@ -3,6 +3,12 @@
   "displayName": "Rust Buddy",
   "description": "Rust productivity toolkit for VS Code — manage crates, scaffold files and modules, and more.",
   "version": "0.0.1",
+  "publisher": "hazyio",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hazyio/rust-buddy"
+  },
   "engines": {
     "vscode": "^1.125.0"
   },

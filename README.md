@@ -1,71 +1,60 @@
-# rust-buddy README
+# Rust Buddy
 
-This is the README for your extension "rust-buddy". After writing up a brief description, we recommend including the following sections.
+Rust productivity toolkit for VS Code — manage crates, scaffold files and modules, and more.
+
+Rust Buddy cuts down on the manual boilerplate of managing a Rust project inside VS Code: creating crates, setting up workspaces, adding crates to an existing workspace, and scaffolding module files — all without leaving the editor or hand-writing `Cargo.toml` entries yourself.
+
+## What it does
+
+- Scaffolds new Rust projects and workspaces directly from VS Code, using `cargo new` under the hood
+- Adds new crates to an existing Cargo workspace and keeps the root `Cargo.toml`'s `members` list correct
+- Creates Rust module files (file-style, directory-style, and `mod.rs`-style) and automatically inserts the corresponding `mod` declaration in the right place
+- Surfaces relevant actions via right-click in the Explorer, based on what kind of folder you clicked (empty folder, workspace root, or crate root) — so you only see options that make sense for that folder
+- Detects your workspace/crate layout automatically; no manual configuration needed
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Project & workspace creation
+- **Create Project** — scaffolds a new standalone Rust crate (binary or library) via `cargo new`
+- **Create Workspace** — sets up a new Cargo workspace root (`[workspace]` in `Cargo.toml`, ready for members)
+- **Add Crate to Workspace** — creates a new crate inside an existing workspace and registers it as a member
 
-For example if there is an image subfolder under your extension project workspace:
+Each of these is available both from the Command Palette and from the Explorer right-click menu — the context-menu versions target the folder you clicked rather than asking you to pick one.
 
-\!\[feature X\]\(images/feature-x.png\)
+### Module scaffolding
+- **New file module** — creates a `name.rs` file and adds `mod name;` to the right parent file
+- **New directory module** — creates a `name/` folder with the modern (no `mod.rs`) layout
+- **New directory module with mod.rs** — creates a `name/mod.rs`-style module (legacy layout)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+In all three cases, Rust Buddy finds the correct place to insert the `mod` declaration — right after any existing `mod` lines, so your declarations stay grouped at the top of the file and any code below is left untouched.
+
+### Context-aware Explorer menu
+Right-click options adapt to what you clicked:
+- An empty folder (not yet part of a crate or workspace) → offers **Create Project** / **Create Workspace**
+- A Cargo workspace root → offers **Add Crate to Workspace**
+- Inside a Rust crate (root or any subfolder) → offers the module-creation commands
+
+This is driven by background detection of your Cargo workspaces and crates, so the menu only shows actions that are actually valid for that location.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- [Rust and Cargo](https://www.rust-lang.org/tools/install) installed and available on your `PATH`
+- Rust Buddy checks for both before running any command and will let you know if either is missing
 
-## Extension Settings
+## Usage
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+1. Open a folder in VS Code that contains (or will contain) Rust code
+2. Right-click a folder in the Explorer, or open the Command Palette and search for **"Rust Buddy"**
+3. Pick the action you need — Rust Buddy handles the `cargo` command and any file/manifest edits for you
 
-For example:
+## Known limitations (early version)
 
-This extension contributes the following settings:
+This is an early build — functionality is intentionally minimal right now so it can be tried out on a real project before more features are added. Known rough edges:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+- No custom module visibility beyond what's offered in the quick pick (`private`, `pub`, `pub(crate)`, `pub(super)`, `pub(self)`)
+- No renaming/deleting of crates or modules through the extension yet — only creation
+- Large repositories with many `Cargo.toml` files may take a moment to fully index on first load
 
-## Known Issues
+## Feedback
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+This extension is under active development. Issues, ideas, and feedback are welcome as it grows beyond this initial feature set.
