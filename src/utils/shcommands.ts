@@ -1,6 +1,8 @@
-import { exec } from "child_process";
+import { execFile, exec } from "child_process";
 import { promisify } from "util";
 const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
+
 const CargoCommand = "cargo";
 const RustCommand = "rustc";
 
@@ -19,18 +21,18 @@ export async function rustVersion(): Promise<string | null> {
 export async function runCommandAsync(
   command: string,
   args: string[],
-  options: {
-    cwd: string;
-  },
+  options: { cwd: string; timeoutMs?: number },
 ): Promise<{ stdout: string; stderr: string }> {
-  const fullCommand = `${command} ${args.join(" ")}`;
   try {
-    const { stdout, stderr } = await execAsync(fullCommand, {
+    const { stdout, stderr } = await execFileAsync(command, args, {
       cwd: options.cwd,
+      timeout: options.timeoutMs ?? 30000, // 30s default — cargo new should never take this long
     });
     return { stdout, stderr };
   } catch (error: any) {
-    throw new Error(`Command failed: ${fullCommand}\n${error.message}`);
+    throw new Error(
+      `Command failed: ${command} ${args.join(" ")}\n${error.message}`,
+    );
   }
 }
 async function commandExists(cmd: string): Promise<boolean> {

@@ -8,14 +8,29 @@ import {
 import { showErrorMessage } from "./utils/logging";
 import { cargoInstalled, rustInstalled } from "./utils/shcommands";
 import path from "path";
-import { createFileModule } from "./cargo/modules";
+import { createDirModule, createFileModule } from "./cargo/modules";
 export function registerCommands(context: vscode.ExtensionContext) {
   pushCommand(context, "rust-buddy.createProject", () => {
     checkRustCargoBeforeCommand(createProject);
   });
+  pushCommand(
+    context,
+    "rust-buddy.createProjectFromContext",
+    (uri: vscode.Uri) => {
+      checkRustCargoBeforeCommand(() => createProject(uri));
+    },
+  );
   pushCommand(context, "rust-buddy.createWorkspace", () => {
     checkRustCargoBeforeCommand(createWorkspace);
   });
+  pushCommand(
+    context,
+    "rust-buddy.createWorkspaceFromContext",
+    (uri: vscode.Uri) => {
+      checkRustCargoBeforeCommand(() => createWorkspace(uri));
+    },
+  );
+
   pushCommand(context, "rust-buddy.addCrateToWorkspace", () => {
     checkRustCargoBeforeCommand(addCrateToWorkspaceFromCommand);
   });
@@ -29,7 +44,9 @@ export function registerCommands(context: vscode.ExtensionContext) {
   pushCommand(
     context,
     "rust-buddy.addDirModuleModFromContext",
-    async (uri: vscode.Uri) => {},
+    async (uri: vscode.Uri) => {
+      createDirModule(uri, true);
+    },
   );
   pushCommand(
     context,
@@ -41,7 +58,9 @@ export function registerCommands(context: vscode.ExtensionContext) {
   pushCommand(
     context,
     "rust-buddy.addDirModuleFromContext",
-    async (uri: vscode.Uri) => {},
+    async (uri: vscode.Uri) => {
+      createDirModule(uri, false);
+    },
   );
 }
 export async function runExtCommands(command: "createWorkspace") {

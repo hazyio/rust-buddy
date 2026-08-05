@@ -1,10 +1,8 @@
 import * as vscode from "vscode";
-import * as fs from "fs/promises";
 
 import { showErrorMessage } from "./logging";
-import path from "path";
 
-export async function fileExists(uri: vscode.Uri): Promise<boolean> {
+export async function pathExists(uri: vscode.Uri): Promise<boolean> {
   try {
     await vscode.workspace.fs.stat(uri);
     return true;
@@ -47,4 +45,18 @@ export async function writeFile(
     showErrorMessage(`Failed to write file: ${error}`);
     return false;
   }
+}
+
+export async function openFile(filePath: vscode.Uri) {
+  const doc = await vscode.workspace.openTextDocument(filePath);
+  const editor = await vscode.window.showTextDocument(doc);
+
+  const lastLine = doc.lineCount - 1;
+  const lastChar = doc.lineAt(lastLine).text.length;
+  editor.selection = new vscode.Selection(
+    lastLine,
+    lastChar,
+    lastLine,
+    lastChar,
+  );
 }

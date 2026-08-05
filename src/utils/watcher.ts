@@ -2,15 +2,42 @@ import * as vscode from "vscode";
 
 import * as fs from "fs/promises";
 
-import { setCargoWorkspaceRoots, setRustCrateRoots } from "./context";
+import {
+  addRustCrateRoot,
+  getRustCrateRoots,
+  removeRustCrateRootsUnder,
+  setCargoWorkspaceRoots,
+  setRustCrateRoots,
+} from "./context";
 import path from "path";
 export function registerWatcher(context: vscode.ExtensionContext) {
-  const watcher = vscode.workspace.createFileSystemWatcher("**/Cargo.toml");
-  watcher.onDidCreate(refreshWorkspaceRoots);
-  watcher.onDidChange(refreshWorkspaceRoots);
-  watcher.onDidDelete(refreshWorkspaceRoots);
+  const cargoWatcher =
+    vscode.workspace.createFileSystemWatcher("**/Cargo.toml");
+  cargoWatcher.onDidCreate(refreshWorkspaceRoots);
+  cargoWatcher.onDidChange(refreshWorkspaceRoots);
+  cargoWatcher.onDidDelete((uri) => {
+    // a crate's Cargo.toml was deleted — that whole crate root (and subtree) is gone
+    removeRustCrateRootsUnder(path.dirname(uri.fsPath));
+    refreshWorkspaceRoots(); // still worth a full rescan here
+  });
 
-  context.subscriptions.push(watcher);
+  context.subscriptions.push(cargoWatcher);
+  // cheap incremental watcher: only reacts to new folders under known crate roots
+  const dirWatcher = vscode.workspace.createFileSystemWatcher("**/");
+  dirWatcher.onDidCreate(async (uri) => {
+    try {
+      const stat = await vscode.workspace.fs.stat(uri);
+      if (stat.type === vscode.FileType.Directory) {
+        handleFolderCreated(uri.fsPath);
+      }
+    } catch {
+      // file may have already been removed by the time we stat it — ignore
+    }
+  });
+  dirWatcher.onDidDelete((uri) => {
+    removeRustCrateRootsUnder(uri.fsPath); // cheap, no rescan needed
+  });
+  context.subscriptions.push(dirWatcher);
   refreshWorkspaceRoots();
 }
 
@@ -75,4 +102,19 @@ export async function collectSubdirs(
       await collectSubdirs(path.join(dir, entry.name), out, exclude);
     }
   }
+}
+function handleFolderCreated(newDir: string) {
+  const normalized = path.normalize(newDir);
+  const roots = getRustCrateRoots();
+
+  // is this new folder inside (or itself) a known crate root's tree?
+  const parentRoot = roots.find(
+    (root) => normalized === root || normalized.startsWith(root + path.sep),
+  );
+
+  if (parentRoot) {
+    addRustCrateRoot(normalized); // O(1) add, no rescan
+  }
+  // if it's not under any known root, ignore — it's either unrelated,
+  // or the start of a brand new crate, which the Cargo.toml watcher will catch
 }

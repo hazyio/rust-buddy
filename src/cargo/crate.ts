@@ -1,10 +1,11 @@
 import * as vscode from "vscode";
 import { collectPath } from "../utils";
-import { collectProjectName } from "./cargo";
+import { collectNameInput } from "./cargo";
 import { runCommandAsync } from "../utils/shcommands";
 import {
   actionableInformationMessage,
   showErrorMessage,
+  showInformationMessage,
 } from "../utils/logging";
 interface CrateCreationOptions {
   projectPath: vscode.Uri[];
@@ -25,7 +26,7 @@ export async function collectCrateCreationOptions(
       return null;
     }
   }
-  let projectName = await collectProjectName(middleEarth, _projectPath[0]);
+  let projectName = await collectNameInput(middleEarth, _projectPath[0]);
   if (projectName === null) {
     return null;
   }
@@ -73,12 +74,12 @@ export async function createCrate(
   const projectUri = vscode.Uri.joinPath(projectPath[0], crateName);
   await vscode.window.withProgress(
     {
-      location: vscode.ProgressLocation.Notification,
+      location: vscode.ProgressLocation.SourceControl,
       title: `Creating ${label}...`,
       cancellable: false,
     },
     async () => {
-      const ed = edition === "none" ? [""] : ["--edition", edition];
+      const ed = edition === "none" ? [] : ["--edition", edition];
       try {
         await runCommandAsync(
           "cargo",
@@ -87,23 +88,26 @@ export async function createCrate(
             cwd: projectPath[0].fsPath,
           },
         );
-
-        await actionableInformationMessage(
-          `${label} ${crateName} created successfully at ${projectUri.fsPath}`,
-          showOpen
-            ? [
-                {
-                  label: "Open",
-                  runWhenSelected: async () => {
-                    await vscode.commands.executeCommand(
-                      "vscode.openFolder",
-                      vscode.Uri.file(projectUri.fsPath),
-                    );
-                  },
+        if (showOpen) {
+          await actionableInformationMessage(
+            `${label} ${crateName} created successfully at ${projectUri.fsPath}`,
+            [
+              {
+                label: "Open",
+                runWhenSelected: async () => {
+                  await vscode.commands.executeCommand(
+                    "vscode.openFolder",
+                    projectUri,
+                  );
                 },
-              ]
-            : [],
-        );
+              },
+            ],
+          );
+        } else {
+          showInformationMessage(
+            `${label} ${crateName} created successfully at ${projectUri.fsPath}`,
+          );
+        }
       } catch (error: any) {
         showErrorMessage(
           `Failed to create ${label} ${crateName} at ${projectPath[0].fsPath}: ${error.message}`,

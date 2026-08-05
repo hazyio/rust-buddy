@@ -17,7 +17,7 @@
     "commands": [
       {
         "command": "rust-buddy.createProject",
-        "title": "Rust Buddy: Create Rust Project (Standalone Crate)"
+        "title": "Rust Buddy: Create Project (Standalone Crate)"
       },
       {
         "command": "rust-buddy.createWorkspace",
@@ -42,6 +42,14 @@
       {
         "command": "rust-buddy.addDirModuleFromContext",
         "title": "Rust Buddy: New directory module"
+      },
+      {
+        "command": "rust-buddy.createWorkspaceFromContext",
+        "title": "Rust Buddy: Create workspace"
+      },
+      {
+        "command": "rust-buddy.createProjectFromContext",
+        "title": "Rust Buddy: Create Rust Project (Standalone Crate)"
       }
     ],
     "menus": {
@@ -61,28 +69,46 @@
         {
           "command": "rust-buddy.addDirModuleFromContext",
           "when": "false"
+        },
+        {
+          "command": "rust-buddy.createWorkspaceFromContext",
+          "when": "false"
+        },
+        {
+          "command": "rust-buddy.createProjectFromContext",
+          "when": "false"
         }
       ],
       "explorer/context": [
         {
           "command": "rust-buddy.addCrateToWorkspaceFromContext",
           "when": "explorerResourceIsFolder && resourcePath in rust-buddy.cargoWorkspaceRoots",
-          "group": "1_rustbuddy"
+          "group": "1_rustbuddy@1"
+        },
+        {
+          "command": "rust-buddy.createProjectFromContext",
+          "when": "explorerResourceIsFolder && !(resourcePath in rust-buddy.cargoWorkspaceRoots) && !(resourcePath in rust-buddy.rustCrateRoots)",
+          "group": "1_rustbuddy@1"
+        },
+        {
+          "command": "rust-buddy.createWorkspaceFromContext",
+          "when": "explorerResourceIsFolder && !(resourcePath in rust-buddy.cargoWorkspaceRoots) && !(resourcePath in rust-buddy.rustCrateRoots)",
+          "group": "1_rustbuddy@2"
         },
         {
           "command": "rust-buddy.addFileModuleFromContext",
           "when": "explorerResourceIsFolder && resourcePath in rust-buddy.rustCrateRoots",
-          "group": "2_rustbuddy"
-        },
-        {
-          "command": "rust-buddy.addDirModuleModFromContext",
-          "when": "explorerResourceIsFolder && resourcePath in rust-buddy.rustCrateRoots",
-          "group": "3_rustbuddy"
+          "group": "1_rustbuddy@3"
         },
         {
           "command": "rust-buddy.addDirModuleFromContext",
           "when": "explorerResourceIsFolder && resourcePath in rust-buddy.rustCrateRoots",
-          "group": "4_rustbuddy"
+          "group": "1_rustbuddy@4"
+        },
+        {
+          "command": "rust-buddy.addDirModuleModFromContext",
+          "when": "explorerResourceIsFolder && resourcePath in rust-buddy.rustCrateRoots",
+          "group": "1_rustbuddy@5"
         }
       ]
     }
