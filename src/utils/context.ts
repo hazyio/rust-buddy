@@ -16,6 +16,7 @@ export async function setRustCrateRoots(roots: string[]): Promise<void> {
   rustCrateRoots = roots;
 }
 export function addRustCrateRoot(dir: string): void {
+
   if (!rustCrateRoots.includes(dir)) {
     rustCrateRoots = [...rustCrateRoots, dir];
     vscode.commands.executeCommand(

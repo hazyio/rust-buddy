@@ -78,6 +78,8 @@ async function refreshWorkspaceRoots() {
 
       setCargoWorkspaceRoots(roots);
       setRustCrateRoots([...crateRoots]);
+      console.log("workspace roots", roots);
+      console.log("Crated roots", crateRoots);
       progress.report({
         message: "Done!",
         increment: 100,

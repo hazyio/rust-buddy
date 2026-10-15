@@ -26,7 +26,7 @@ function visibilityToPrefix(visibility: Visibility): string {
 }
 async function collectModuleVisibility(): Promise<Visibility | null> {
   const choice = await vscode.window.showQuickPick(
-    ["private", "public", "pub(self)", "pub(crate)", "pub(super)"],
+    ["public", "private", "pub(self)", "pub(crate)", "pub(super)"],
     { placeHolder: "Module visibility" },
   );
   if (choice === undefined) {
@@ -77,6 +77,21 @@ export async function createFileModule(uri: vscode.Uri) {
   }
   await openFile(newModuleFilePath);
 }
+/**
+ * Creates a new directory-based Rust module at the specified URI.
+ *
+ * Prompts the user for a valid Rust module name and visibility modifier,
+ * creates the folder and corresponding module file (`mod.rs` or `<name>.rs`),
+ * automatically appends the `mod` declaration to the parent module, and opens
+ * the newly created file in the editor.
+ *
+ * @param uri - The target parent directory `vscode.Uri` where the module folder will be created.
+ * @param useMod - Controls the module layout strategy:
+ *                 - `true`: Creates `<uri>/<moduleName>/mod.rs` (Classic Rust layout).
+ *                 - `false`: Creates `<uri>/<moduleName>.rs` alongside `<uri>/<moduleName>/` (Rust 2018 layout).
+ *
+ * @returns A promise that resolves when module creation is completed or aborted by the user.
+ */
 export async function createDirModule(uri: vscode.Uri, useMod: boolean) {
   let moduleName = await collectNameInput("module", uri, "", {
     validator: async (text) => {
@@ -121,10 +136,23 @@ export async function createDirModule(uri: vscode.Uri, useMod: boolean) {
   await writeFile(newModuleFilePath, "");
   await openFile(newModuleFilePath);
 }
+/**
+ * Resolves the parent Rust source file where a module declaration (`mod <name>;`)
+ * should be registered for a given directory URI.
+ *
+ * Checks target parent files in the following precedence:
+ * 1. Sibling file: `<dir>.rs` (Rust 2018 edition style, virtual-FS safe)
+ * 2. Internal module root: `<dir>/mod.rs` (Classic Rust style)
+ * 3. Library root: `<dir>/lib.rs` (Library crate root)
+ * 4. Binary root: `<dir>/main.rs` (Binary crate root)
+ *
+ * @param dirUri - The `vscode.Uri` of the target module directory.
+ * @returns The `vscode.Uri` of the parent file that should contain the `mod` statement, or `null` if none exist.
+ */
 async function findModuleDeclarationFile(
   dirUri: vscode.Uri,
 ): Promise<vscode.Uri | null> {
-  const fileStyle = vscode.Uri.file(`${dirUri.fsPath}.rs`);
+  const fileStyle = dirUri.with({ path: `${dirUri.path}.rs` });
   if (await pathExists(fileStyle)) {
     return fileStyle;
   }
@@ -134,8 +162,19 @@ async function findModuleDeclarationFile(
     return modRsStyle;
   }
 
+  const libRsStyle = vscode.Uri.joinPath(dirUri, "lib.rs");
+  if (await pathExists(libRsStyle)) {
+    return libRsStyle;
+  }
+
+  const mainRsStyle = vscode.Uri.joinPath(dirUri, "main.rs");
+  if (await pathExists(mainRsStyle)) {
+    return mainRsStyle;
+  }
+
   return null;
 }
+
 async function appendModuleDeclaration(
   uri: vscode.Uri,
   moduleName: string,

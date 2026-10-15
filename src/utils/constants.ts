@@ -16,7 +16,6 @@ export const RUST_KEYWORDS = [
   "let",
   "loop",
   "match",
-  "mod",
   "move",
   "mut",
   "pub",
@@ -49,6 +48,4 @@ export const RUST_KEYWORDS = [
   "unsized",
   "virtual",
   "yield",
-  "macro_rules",
-  "union",
 ];
