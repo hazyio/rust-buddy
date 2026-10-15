@@ -4,9 +4,6 @@ Rust productivity toolkit for VS Code — manage crates, scaffold files and modu
 
 Rust Buddy cuts down on the manual boilerplate of managing a Rust project inside VS Code: creating crates, setting up workspaces, adding crates to an existing workspace, and scaffolding module files — all without leaving the editor or hand-writing `Cargo.toml` entries yourself.
 
-## Preview
-
-[![Watch the Rust Buddy preview](https://img.youtube.com/vi/sjuisARFWn8/hqdefault.jpg)](https://www.youtube.com/watch?v=sjuisARFWn8)
 
 ## What it does
 
@@ -20,6 +17,7 @@ Rust Buddy cuts down on the manual boilerplate of managing a Rust project inside
 ## Features
 
 ### Project & workspace creation
+
 - **Create Project** — scaffolds a new standalone Rust crate (binary or library) via `cargo new`
 - **Create Workspace** — sets up a new Cargo workspace root (`[workspace]` in `Cargo.toml`, ready for members)
 - **Add Crate to Workspace** — creates a new crate inside an existing workspace and registers it as a member
@@ -27,6 +25,7 @@ Rust Buddy cuts down on the manual boilerplate of managing a Rust project inside
 These actions are available from the Command Palette. Explorer context-menu actions target the folder you clicked. The Command Palette also lets you choose a workspace when adding a crate.
 
 ### Module scaffolding
+
 - **New file module** — creates a `name.rs` file and adds `mod name;` to the right parent file
 - **New directory module** — creates a `name/` folder with the modern (no `mod.rs`) layout
 - **New directory module with mod.rs** — creates a `name/mod.rs`-style module (legacy layout)
@@ -34,7 +33,9 @@ These actions are available from the Command Palette. Explorer context-menu acti
 When Rust Buddy finds the parent Rust source file, it inserts the `mod` declaration alongside existing module declarations. If no matching parent source file is available, it creates the module file or folder without adding a declaration.
 
 ### Context-aware Explorer menu
+
 Right-click options adapt to the folder’s detected Cargo location:
+
 - A folder not detected as a crate or workspace root → offers **Create Project** / **Create Workspace** (the folder does not have to be empty)
 - A Cargo workspace root → offers **Add Crate to Workspace**
 - A folder inside a detected Rust crate → offers the module-creation commands
